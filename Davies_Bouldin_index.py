@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from sklearn.cluster import k_means
 from scipy.spatial import distance
@@ -6,52 +5,51 @@ from numpy import linalg as LA
 from scipy.linalg import norm
 
 n=10
-clf=k_means(X4, n_clusters=n)
-centroids=clf[0]
-labels=clf[1]
+# centroids - matrix containing the centroids of the n clusters
+# labels - array of labels of each point 
+# nc - no of clusters
 nc=len(centroids)
 
+
+# function to calculate cluster scatter for each centroid. Takes the Coordinate of cluster center and index of centroid in centroids matrix
 def cluster_scatter(centroid,i):
     index=0
     S_i=0
-    for a in range(len(X4new)) :
+    for a in range(len(data)) :
         if labels[a]==i:
-            dst = dist = np.linalg.norm(centroid-(X4new[a]))
+            dst = dist = np.linalg.norm(centroid-(data[a]))
             S_i+=dst
-    #print S_i       
     c=norm(centroid)
-    #print 'c',c
     Si=S_i/c
-    #print 'SI',Si
     return Si
-    
-scat=np.zeros((10,1))
+# scat - empty numpy array to store the cluster scatter values of each cluster.
 for i in range(10):
     scat[i]=cluster_scatter(centroids[i],i)
-    
+
+# function to calculate D_i_j ,separation between the ith and the jth cluster, which ideally has to be as large as possible
 def distance_clusters(a,b):
+    # d_i_j - Euclidean distance between a and b.
     d_i_j=np.linalg.norm(a-b)
     
     return d_i_j
-    
-def R_i_j(centroids,X4new):
+
+# funtion to obtain R_i_j,measure of how good the clustering scheme is.
+def R_i_j(centroids,data):
     X_syn= np.zeros((90,1))
     p=0
-    q=0
     for i in range(len(centroids)):
         for j in range(len(centroids)):
             if i!=j:
-                #print'scat1',scat[i],'scat2', scat[j]
                 dij=distance_clusters(centroids[i],centroids[j])
-                #print 'dij', dij
                 X_syn[p] =(scat[i]+scat[j])/dij
-                #print 'Xin', X_syn[p]
                 p+=1
             else:
                     continue
                     
     return X_syn
-    
+
+# R_i =array of max value of R_i_j for each cluster
+# x = output of R_i_j function fed to R_i
 def R_i(x):
     c=len(x)
     index=0
@@ -62,7 +60,8 @@ def R_i(x):
         index+=1        
         
     return R_n
-    
+# function to calculate davies-bouldin index using value generated in R_i    
+# z= output of R_i function fed to db
 def db(z):
     D=0
     for i in y:
